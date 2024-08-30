@@ -1,21 +1,23 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
-
+import java.util.ArrayList;
+import java.util.List;
 public class User {
     private static int idCounter = 1;
     private int id;
-    private String FirstName;
-    private String LastName;
-    private int Age;
+    private String firstName;
+    private String lastName;
+    private int age;
+
+    private List<Carbon> carbons;
 
     public User(String firstName, String lastName, int age) {
         this.id = idCounter++;
-        this.FirstName = firstName;
-        this.LastName = lastName;
-        this.Age = age;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.carbons = new ArrayList<>();  // Initialize the list of consumptions
+    }
+
+    public User() {
     }
 
     public int getId() {
@@ -23,26 +25,37 @@ public class User {
     }
 
     public String getFirstName() {
-        return this.FirstName;
+        return this.firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.FirstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-        return this.LastName;
+        return this.lastName;
     }
 
     public void setLastName(String lastName) {
-        this.LastName = lastName;
+        this.lastName = lastName;
     }
 
     public int getAge() {
-        return this.Age;
+        return this.age;
     }
 
     public void setAge(int age) {
-        this.Age = age;
+        this.age = age;
     }
+
+    //consommation
+    public void addConsumption(Carbon consumption) {
+        carbons.add(consumption);
+    }
+
+    public List<Carbon> getCarbons() {
+        return carbons;
+    }
+
+
 }
