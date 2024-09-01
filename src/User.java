@@ -7,14 +7,14 @@ public class User {
     private String lastName;
     private int age;
 
-    private List<Carbon> carbons;
+    private List<Carbon> Carbonconsumption;
 
     public User(String firstName, String lastName, int age) {
         this.id = idCounter++;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.carbons = new ArrayList<>();  // Initialize the list of consumptions
+        this.Carbonconsumption = new ArrayList<>();  // Initialize the list of consumptions
     }
 
     public User() {
@@ -50,11 +50,11 @@ public class User {
 
     //consommation
     public void addConsumption(Carbon consumption) {
-        carbons.add(consumption);
+        Carbonconsumption.add(consumption);
     }
 
     public List<Carbon> getCarbons() {
-        return carbons;
+        return Carbonconsumption;
     }
 
 
