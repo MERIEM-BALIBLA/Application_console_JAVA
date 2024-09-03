@@ -1,9 +1,10 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.time.temporal.*;
+import java.time.*;
+
 
 public class ConsumptionManager {
 
@@ -74,17 +75,77 @@ public class ConsumptionManager {
         return totalConsumption;
     }
 
-    public void rapport(List<CarbonConsumption> carbonConsumptionList ){
-        Map<LocalDate, Double> ListCarbonJournalier = new HashMap<>();
+    public void rapportDay(List<CarbonConsumption> carbonConsumptionList) {
+        for (CarbonConsumption carbonConsumption : carbonConsumptionList) {
+            LocalDate startDate = carbonConsumption.getStart();
+            LocalDate endDate = carbonConsumption.getEnd();
+            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);  // +1 to include both start and end dates
 
-        for(CarbonConsumption carbonConsumption : carbonConsumptionList){
+            double quantityPerDay;
 
-            LocalDate StartDate = carbonConsumption.getStart();
-            LocalDate EndDate = carbonConsumption.getEnd();
-            double Quantity = carbonConsumption.getQuantity();
+            if (startDate.equals(endDate)) {
+                quantityPerDay = carbonConsumption.getQuantity();
+                System.out.println(startDate + " quantity: " + quantityPerDay);
+            } else {
+                quantityPerDay = carbonConsumption.getQuantity() / daysBetween;
 
-            ListCarbonJournalier.put(StartDate, Quantity);
+                // Loop through each day in the date range
+                LocalDate currentDate = startDate;
+                while (!currentDate.isAfter(endDate)) {
+                    System.out.println(currentDate + " quantity: " + quantityPerDay);
+                    currentDate = currentDate.plusDays(1);  // Move to the next day
+                }
+            }
         }
     }
 
+    public LocalDate getStartOfWeek(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    // Function to get the end of the week for a given date
+    public LocalDate getEndOfWeek(LocalDate startOfWeek) {
+        return startOfWeek.plusDays(6);
+    }
+
+    // Function to find the week containing a specific date
+    public void printWeeklyConsumptionForDateRange(List<CarbonConsumption> consumptionList, LocalDate startDate, LocalDate endDate) {
+        LocalDate currentStartOfWeek = getStartOfWeek(startDate);
+
+        // Loop through each week from startDate to endDate
+        while (!currentStartOfWeek.isAfter(endDate)) {
+            LocalDate currentEndOfWeek = getEndOfWeek(currentStartOfWeek);
+
+            // Ensure the end of the week doesn't go beyond the given endDate
+            if (currentEndOfWeek.isAfter(endDate)) {
+                currentEndOfWeek = endDate;
+            }
+
+            System.out.println("\nWeek from " + currentStartOfWeek + " to " + currentEndOfWeek + ":");
+
+            double weeklyQuantitySum = 0.0;  // Variable to accumulate quantity for the week
+
+            // Check and accumulate the consumption data that falls within the current week
+            for (CarbonConsumption consumption : consumptionList) {
+                // Adjust the start and end dates to fit within the week boundaries
+                LocalDate consumptionStart = consumption.getStart().isBefore(currentStartOfWeek) ? currentStartOfWeek : consumption.getStart();
+                LocalDate consumptionEnd = consumption.getEnd().isAfter(currentEndOfWeek) ? currentEndOfWeek : consumption.getEnd();
+
+                // Calculate the number of days for this part of the week
+                long daysInWeek = ChronoUnit.DAYS.between(consumptionStart, consumptionEnd) + 1;
+
+                // Calculate quantity for these days and add to the weekly sum
+                double quantityForWeek = (consumption.getQuantity() / ChronoUnit.DAYS.between(consumption.getStart(), consumption.getEnd() ) + 1 ) * daysInWeek;
+                weeklyQuantitySum += quantityForWeek;
+
+                System.out.println("  " + consumptionStart + " to " + consumptionEnd + ": " + quantityForWeek);
+            }
+
+            // Print out the total quantity for the week
+            System.out.println("Total quantity for the week: " + weeklyQuantitySum);
+
+            // Move to the next week
+            currentStartOfWeek = currentStartOfWeek.plusWeeks(1);
+        }
+    }
 }

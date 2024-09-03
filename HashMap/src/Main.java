@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.*;
 
 public class Main {
@@ -110,20 +111,27 @@ public class Main {
 
                 //Rapport de consommation
                 case 7:
-                    System.out.println("Enter User id here :");
-                    int id = scanner.nextInt();
-                    User userID = userManager.foundUser(id);
+                    System.out.println("Enter the user ID for the report:");
+                    int reportID = scanner.nextInt();
+                    scanner.nextLine();  // Consume newline
+                    User userForReport = userManager.foundUser(reportID);
 
-                    if(userID != null){
-                        System.out.println("Chose a type :");
-                        int rapportType = scanner.nextInt();
+                    if (userForReport != null) {
+                        System.out.println("Consumption Report:");
+                        List<CarbonConsumption> consumptions = userForReport.getCarbonConsumption();
 
-                        switch (rapportType){
-                            case 1:
+                        if (!consumptions.isEmpty()) {
+                            consumptionManager.rapportDay(consumptions);
+                            LocalDate sdate = consumptions.get(0).getStart();
+                            LocalDate edate = consumptions.get(0).getEnd();
 
-                                //consumptionManager.rapport(consumptions);
-                                break;
+                            consumptionManager.printWeeklyConsumptionForDateRange(consumptions, sdate, edate);
+
+                        } else {
+                            System.out.println("No consumption data found for this user.");
                         }
+                    } else {
+                        System.out.println("User not found.");
                     }
                     break;
 
