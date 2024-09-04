@@ -122,10 +122,12 @@ public class Main {
 
                         if (!consumptions.isEmpty()) {
                             consumptionManager.rapportDay(consumptions);
-                            LocalDate sdate = consumptions.get(0).getStart();
-                            LocalDate edate = consumptions.get(0).getEnd();
+                            //LocalDate sdate = consumptions.get(0).getStart();
+//                            LocalDate edate = consumptions.get(0).getEnd();
 
-                            consumptionManager.report(consumptions);
+                            consumptionManager.reportWeek(consumptions);
+                            consumptionManager.reportMonth(consumptions);
+
 
                         } else {
                             System.out.println("No consumption data found for this user.");
@@ -137,7 +139,6 @@ public class Main {
 
                 default: System.out.println("ERROR");
             }
-
         }
     }
 }
