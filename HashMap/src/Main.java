@@ -125,7 +125,7 @@ public class Main {
                             LocalDate sdate = consumptions.get(0).getStart();
                             LocalDate edate = consumptions.get(0).getEnd();
 
-                            consumptionManager.printWeeklyConsumptionForDateRange(consumptions, sdate, edate);
+                            consumptionManager.report(consumptions);
 
                         } else {
                             System.out.println("No consumption data found for this user.");

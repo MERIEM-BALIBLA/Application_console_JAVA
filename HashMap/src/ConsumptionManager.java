@@ -1,3 +1,5 @@
+import Util.DateUtil;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -57,16 +59,32 @@ public class ConsumptionManager {
                 }
             }
 
-            // Création d'objet consommation
-            CarbonConsumption carbonConsumption = new CarbonConsumption(quantity, startDate, endDate);
-            user.addConsumption(carbonConsumption);
-            System.out.println("Carbon consumption added successfully!");
+
+
+            boolean status = DateUtil.isAvailableInRange(startDate, endDate, listConsumptionDates(user.getCarbonConsumption()));
+            if(!status){
+                System.out.println("Is not available");
+            }else{
+                // Création d'objet consommation
+                CarbonConsumption carbonConsumption = new CarbonConsumption(quantity, startDate, endDate);
+                user.addConsumption(carbonConsumption);
+                System.out.println("Carbon consumption added successfully!");
+            }
         } else {
             System.out.println("User not found!");
         }
     }
 
     // Somme des consommation
+    public List<LocalDate> listConsumptionDates(List<CarbonConsumption> carbonConsumptionList){
+        List<LocalDate> listDate=new ArrayList<>();
+        for (CarbonConsumption c : carbonConsumptionList){
+            for (LocalDate currentDate=c.getStart();!currentDate.isAfter(c.getEnd());currentDate = currentDate.plusDays(1)){
+                listDate.add(currentDate);
+            }
+        }
+        return listDate;
+    }
     public double calculateTotalConsumption(List<CarbonConsumption> carbonConsumptionList) {
         double totalConsumption = 0;
         for (CarbonConsumption carbonConsumption : carbonConsumptionList) {
@@ -79,27 +97,19 @@ public class ConsumptionManager {
         for (CarbonConsumption carbonConsumption : carbonConsumptionList) {
             LocalDate startDate = carbonConsumption.getStart();
             LocalDate endDate = carbonConsumption.getEnd();
-            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);  // +1 to include both start and end dates
+            long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;  // +1 to include both start and end dates
 
             double quantityPerDay;
-
-            if (startDate.equals(endDate)) {
-                quantityPerDay = carbonConsumption.getQuantity();
-                System.out.println(startDate + " quantity: " + quantityPerDay);
-            } else {
-                quantityPerDay = carbonConsumption.getQuantity() / daysBetween;
-
-                // Loop through each day in the date range
-                LocalDate currentDate = startDate;
-                while (!currentDate.isAfter(endDate)) {
-                    System.out.println(currentDate + " quantity: " + quantityPerDay);
-                    currentDate = currentDate.plusDays(1);  // Move to the next day
-                }
+            quantityPerDay = carbonConsumption.getQuantity() / daysBetween;
+            LocalDate currentDate = startDate;
+            while (!currentDate.isAfter(endDate)) {
+                System.out.println(currentDate + " quantity: " + quantityPerDay);
+                currentDate = currentDate.plusDays(1);  // Move to the next day
             }
         }
     }
 
-    public LocalDate getStartOfWeek(LocalDate date) {
+    /*public LocalDate getStartOfWeek(LocalDate date) {
         return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
     }
 
@@ -148,4 +158,29 @@ public class ConsumptionManager {
             currentStartOfWeek = currentStartOfWeek.plusWeeks(1);
         }
     }
+*/
+
+    public void reportWeek(List<CarbonConsumption> carbonConsumptionList){
+
+    }
+    public void report(List<CarbonConsumption> carbonConsumptionList){
+        double daily = 0;
+        double weekly = 0;
+        double monthly = 0;
+
+        for (CarbonConsumption consomation : carbonConsumptionList) {
+            long days = ChronoUnit.DAYS.between(consomation.getStart(), consomation.getEnd()) + 1;
+            double dailyValue = consomation.getQuantity() / days;
+            //daily += dailyValue;
+            weekly += dailyValue * 7;
+            monthly += dailyValue * 30;
+            System.out.println("Weeks report : " + weekly );
+            System.out.println("Months report : " + monthly );
+        }
+    }
+
+
+
+
+
 }
